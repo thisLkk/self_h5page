@@ -1,17 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title>demo</title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but demo doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title>时光是沙、无法把握</title>
+  <script>
+    var adaptive = {
+      dpr: 1,
+      scale: 1,
+      tid: null,
+      newBase: 100,
+      designWidth: 750,
+      baseFont: 16
+    };
+    var devicePixelRatio = window.devicePixelRatio;
+
+    function setViewport(setDpr) {
+      var isIPhone = /iphone/gi.test(window.navigator.appVersion);
+      adaptive.dpr = isIPhone ? devicePixelRatio >= 3 ? 3 : 2 === devicePixelRatio ? 2 : 1 : 1;
+      setDpr && (adaptive.dpr = setDpr);
+      window.devicePixelRatioValue = adaptive.dpr;
+      window.document.documentElement.setAttribute('data-dpr', adaptive.dpr);
+      adaptive.scale = 1 / adaptive.dpr;
+
+      var hasMetaEl = window.document.querySelector('meta[name="viewport"]');
+      if (hasMetaEl) {
+        if (isIPhone) {
+          hasMetaEl.setAttribute('content', [
+            'initial-scale=',
+            adaptive.scale,
+            'maximum-scale=' + adaptive.scale,
+            ', minimum-scale=' + adaptive.scale + ', user-scalable=no'].join(''));
+        }
+        else {
+          hasMetaEl.setAttribute('content', [
+            'width=device-width, initial-scale=',
+            adaptive.scale,
+            ', maximum-scale=' + adaptive.scale,
+            ', minimum-scale=' + adaptive.scale + ', user-scalable=no'].join(''));
+        }
+      }
+      else {
+        try {
+          var metaEl = window.document.createElement('meta');
+          metaEl.setAttribute('name', 'viewport');
+          if (isIPhone) {
+            metaEl.setAttribute('content', [
+              'initial-scale=',
+              adaptive.scale,
+              ', maximum-scale=' + adaptive.scale,
+              ', minimum-scale=' + adaptive.scale + ', user-scalable=no'].join(''));
+          }
+          else {
+            metaEl.setAttribute('content', [
+              'width=device-width, initial-scale=',
+              adaptive.scale,
+              ', maximum-scale=' + adaptive.scale,
+              ', minimum-scale=' + adaptive.scale + ', user-scalable=no'].join(''));
+          }
+
+          window.document.documentElement.firstElementChild.appendChild(metaEl);
+        } catch (e) {
+          var wrap = window.document.createElement('div');
+          wrap.appendChild(metaEl);
+          window.document.write(wrap.innerHTML);
+        }
+      }
+    }
+
+    function setRem(errDpr) {
+      var layoutView;
+      if (adaptive.maxWidth) {
+        layoutView = Math.min(window.document.documentElement.getBoundingClientRect().width, adaptive.maxWidth * adaptive.dpr);
+      }
+      else {
+        layoutView = window.document.documentElement.getBoundingClientRect().width;
+      }
+      adaptive.newBase = 100 * layoutView / adaptive.designWidth * (errDpr || 1);
+      window.document.documentElement.style.fontSize = adaptive.newBase + 'px';
+      window.document.body && (window.document.body.style.fontSize = adaptive.baseFont / 100 + 'rem');
+      adaptive.setRemCallback && adaptive.setRemCallback();
+    }
+
+    adaptive.init = function () {
+      window.addEventListener('orientationchange', function () {
+        clearTimeout(adaptive.tid);
+        adaptive.tid = setTimeout(setRem, 100);
+      });
+      window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+          clearTimeout(adaptive.tid);
+          adaptive.tid = setTimeout(setRem, 100);
+        }
+      });
+      if ('complete' === window.document.readyState) {
+        window.document.body.style.fontSize = adaptive.baseFont / 100 + 'rem';
+      }
+      else {
+        window.document.addEventListener('DOMContentLoaded', function (e) {
+          if (window.document.body) {
+            window.document.body.style.fontSize = adaptive.baseFont / 100 + 'rem';
+          }
+        });
+      }
+
+      setViewport();
+      setRem();
+
+      if (/android/gi.test(window.navigator.appVersion)) {
+        setTimeout(function () {
+          if (document.body) {
+            var hideDiv = document.createElement('p');
+            hideDiv.style.height = '1px';
+            hideDiv.style.width = '2.5rem';
+            hideDiv.style.visibility = 'hidden';
+            document.body.appendChild(hideDiv);
+            var now = hideDiv.offsetWidth;
+            var right = 2.5 * adaptive.newBase;
+            if (Math.abs(right / now - 1) > .05) {
+              setRem(right / now);
+            }
+            document.body.removeChild(hideDiv);
+          }
+
+        }, 1e3);
+      }
+    };
+    adaptive.init();
+  </script>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but demo doesn't work properly without JavaScript enabled. Please enable it to
+      continue.</strong>
+  </noscript>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+
 </html>

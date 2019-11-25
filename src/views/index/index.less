@@ -1,0 +1,94 @@
+@import "~variable";
+
+.mains {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: .6rem .4rem;
+    box-sizing: border-box;
+
+    .m-card {
+        height: calc(100% - .4rem);
+        position: relative;
+        perspective: 1600; // 3d透视点
+        .m-card-item-box {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100%);
+            border-radius: .24rem;
+            transform-style: preserve-3d;
+            transform: scale3d(1, 1, 1);
+            opacity: 1;
+            z-index: auto;
+            .m-card-item {
+                width: 100%;
+                height: 100%;
+                position: relative;
+                overflow: hidden;
+                border-radius: .06rem;
+                background-color: #FFF;
+                box-shadow: 0 .02rem .12rem 0rem rgba(39, 49, 64, .2);
+                transition: transform 0.5s ease, opacity 0.5s ease 0.5s;
+                
+                .m-c-item-img {
+                    margin: .1rem auto;
+                    width: 5.8rem;
+                    height: 7.7rem;
+                    background: @fontPlaceholder;
+                    img {
+                        display: inline-block;
+                        width: 100%;
+                        margin: 0 auto;
+                    }
+                }
+            }
+        }
+
+    }
+
+}
+// 实现卡片叠压
+// 一级不缩放
+.oneScale {
+    transform: translateY(0) scale3d(1, 1, 1);
+}
+// 二级缩放
+.twoScale {
+    transform: translateY(.5rem) scale3d(.96, .96, .96);
+}
+// 三级缩放
+.threeScale {
+    transform: translateY(1rem) scale3d(.92, .92, .92);
+}
+// 向上滑动的动画（translateY的值为当前屏幕高减小3~10px）
+.upAnimation {
+    transform-origin: 50% 100%;
+    animation: upAnimation 0.6s ease forwards;
+}
+
+@keyframes upAnimation {
+    0% {
+        transform: translateY(0) scale3d(1, 1, 1);
+    }
+
+    100% {
+        transform: translateY(-12.3rem) scale3d(1, 1, 1);
+    }
+}
+// 向下滑动的动画
+.downAnimation {
+    transform-origin: 50% 0;
+    animation: downAnimation 0.6s ease forwards;
+}
+
+@keyframes downAnimation {
+    0% {
+        transform: translateY(-12.3rem) scale3d(1, 1, 1);
+    }
+
+    100% {
+        transform: translateY(0) scale3d(1, 1, 1);
+    }
+}
