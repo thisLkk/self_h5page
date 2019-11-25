@@ -22,6 +22,7 @@
 </template>
 <script>
 import animation from "@components/animation/animation.vue";
+import { Toast } from 'mint-ui';
 export default {
     name: "App",
     data() {
@@ -35,10 +36,6 @@ export default {
                 {
                     name: "主页",
                     path: "/"
-                },
-                {
-                    name: "其他",
-                    path: "/about"
                 }
             ]
         };
@@ -51,7 +48,9 @@ export default {
     components: {
         animation
     },
-    created() {},
+    created() {
+        Toast('提示信息');
+    },
     mounted() {},
     methods: {
         // 首页路由跳转
